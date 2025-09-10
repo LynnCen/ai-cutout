@@ -20,12 +20,12 @@ export interface DifyConfigs {
 const DEFAULT_CONFIGS: DifyConfigs = {
   product: {
     apiKey: 'app-VGWfwD4f7iQVdvziM8Nz8cEt', // 商品抠图专用API KEY
-    baseUrl: DIFY_BASE_URL
+    baseUrl: DIFY_BASE_URL,
   },
   portrait: {
     apiKey: 'app-uxF3VOkewjNFs6BGYrmwFJdF', // 原有的API KEY作为人像抠图
-    baseUrl: DIFY_BASE_URL
-  }
+    baseUrl: DIFY_BASE_URL,
+  },
 };
 
 export class DifyClient {
@@ -54,17 +54,21 @@ export class DifyClient {
    * @param files 可选的文件列表
    * @returns API响应
    */
-  private async request(inputs: Record<string, any>, type: MattingType, files?: string[]): Promise<DifyResponse> {
+  private async request(
+    inputs: Record<string, any>,
+    type: MattingType,
+    files?: string[]
+  ): Promise<DifyResponse> {
     const config = this.getConfigForType(type);
     if (!config) {
       throw new Error(`不支持的抠图类型: ${type}`);
     }
     const requestBody: any = {
       inputs,
-      response_mode: "streaming",
-      user: "matting-user-" + Date.now()
+      response_mode: 'streaming',
+      user: 'matting-user-' + Date.now(),
     };
-    
+
     if (files && files.length > 0) {
       requestBody.files = files;
     }
@@ -72,10 +76,10 @@ export class DifyClient {
     const response = await fetch(`${config.baseUrl || DIFY_BASE_URL}/workflows/run`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        Authorization: `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -94,6 +98,7 @@ export class DifyClient {
     const decoder = new TextDecoder();
 
     try {
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -105,7 +110,7 @@ export class DifyClient {
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(6));
-              
+
               // 查找包含结果数据的响应
               if (data.event === 'workflow_finished' && data.data) {
                 finalResult = data;
@@ -135,10 +140,10 @@ export class DifyClient {
    */
   async processImage(imageDataUrl: string, type: MattingType = 'auto') {
     try {
-      const imageUrl = imageDataUrl.startsWith('http') 
-        ? imageDataUrl 
+      const imageUrl = imageDataUrl.startsWith('http')
+        ? imageDataUrl
         : 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1';
-      
+
       // 调用Dify API进行抠图处理
       try {
         const inputs = { image: imageUrl };
@@ -148,27 +153,26 @@ export class DifyClient {
           const contentStr = response.data.outputs.content;
           const resources = this.parseContentResources(contentStr);
           const maskImageUri = this.extractImageUri(resources);
-          
+
           if (maskImageUri) {
             // 对于商品抠图，需要进行图像处理
             if (type === 'product') {
               try {
-                console.log('url', imageUrl, maskImageUri);
                 // 使用原图和mask生成最终的抠图结果
                 const resultCanvas = await ImageProcessor.fuseImageWithMask(imageUrl, maskImageUri);
                 const resultImageDataUrl = ImageProcessor.canvasToDataURL(resultCanvas);
-                
+
                 return {
                   maskImage: maskImageUri, // 原始黑白mask
                   resultImage: resultImageDataUrl, // 处理后的抠图结果
-                  confidence: 0.95
+                  confidence: 0.95,
                 };
               } catch (processError) {
                 console.warn('图像处理失败，返回原始结果:', processError);
                 return {
                   maskImage: maskImageUri,
                   resultImage: maskImageUri,
-                  confidence: 0.95
+                  confidence: 0.95,
                 };
               }
             } else {
@@ -176,7 +180,7 @@ export class DifyClient {
               return {
                 maskImage: maskImageUri,
                 resultImage: maskImageUri,
-                confidence: 0.95
+                confidence: 0.95,
               };
             }
           }
@@ -187,11 +191,11 @@ export class DifyClient {
 
       // 如果API调用失败，返回模拟结果用于演示
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       return {
         maskImage: imageUrl,
         resultImage: imageUrl,
-        confidence: this.getConfidenceByType(type)
+        confidence: this.getConfidenceByType(type),
       };
     } catch (error) {
       console.error('处理失败:', error);
@@ -235,7 +239,7 @@ export class DifyClient {
           maskImage: imageUrl,
           resultImage: imageUrl,
           confidence: 0,
-          error: error instanceof Error ? error.message : '处理失败'
+          error: error instanceof Error ? error.message : '处理失败',
         });
       }
     }
@@ -252,7 +256,7 @@ export class DifyClient {
       auto: '自动抠图',
       portrait: '人像抠图',
       product: '商品抠图',
-      graphic: '图形抠图'
+      graphic: '图形抠图',
     };
     return labels[type] || '自动抠图';
   }
@@ -264,12 +268,12 @@ export class DifyClient {
    */
   private getConfidenceByType(type: MattingType): number {
     const confidenceMap: Record<MattingType, number> = {
-      auto: 0.90,
+      auto: 0.9,
       portrait: 0.95,
       product: 0.92,
-      graphic: 0.88
+      graphic: 0.88,
     };
-    return confidenceMap[type] || 0.90;
+    return confidenceMap[type] || 0.9;
   }
 
   /**
@@ -293,11 +297,14 @@ export class DifyClient {
    * @returns 图片URI或null
    */
   private extractImageUri(resources: ContentResource[]): string | null {
-    const imageResource = resources.find(item => 
-      item.type === 'resource' && 
-      item.resource && 
-      item.resource.uri &&
-      (item.resource.mimeType?.includes('image') || item.resource.uri.includes('.png') || item.resource.uri.includes('.jpg'))
+    const imageResource = resources.find(
+      item =>
+        item.type === 'resource' &&
+        item.resource &&
+        item.resource.uri &&
+        (item.resource.mimeType?.includes('image') ||
+          item.resource.uri.includes('.png') ||
+          item.resource.uri.includes('.jpg'))
     );
     return imageResource?.resource.uri || null;
   }

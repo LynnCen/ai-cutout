@@ -50,13 +50,13 @@ npm run build
 
 ## 🏗️ Tech Stack
 
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| **Vue 3** | Frontend framework | ^3.4.0 |
-| **TypeScript** | Type safety | ^5.3.3 |
-| **Vite** | Build tool | ^5.0.8 |
-| **Tailwind CSS** | Styling | ^3.3.6 |
-| **Dify** | AI workflow platform | API |
+| Technology       | Purpose              | Version |
+| ---------------- | -------------------- | ------- |
+| **Vue 3**        | Frontend framework   | ^3.4.0  |
+| **TypeScript**   | Type safety          | ^5.3.3  |
+| **Vite**         | Build tool           | ^5.0.8  |
+| **Tailwind CSS** | Styling              | ^3.3.6  |
+| **Dify**         | AI workflow platform | API     |
 
 ## 📁 Project Structure
 
@@ -106,7 +106,9 @@ Customize styles in `tailwind.config.js`:
 theme: {
   extend: {
     colors: {
-      primary: { /* custom colors */ }
+      primary: {
+        /* custom colors */
+      }
     }
   }
 }
@@ -115,12 +117,14 @@ theme: {
 ## 🏛️ Architecture Highlights
 
 ### Clean Architecture
+
 - **Pure Functions**: Utility functions without side effects
 - **Composables**: Vue composables for stateful logic
 - **Type Safety**: Full TypeScript coverage
 - **No Backend**: Frontend-only with AI API integration
 
 ### Modern Development
+
 - **Composition API**: Vue 3's latest paradigm
 - **Fetch API**: Native HTTP client, no axios dependency
 - **ES Modules**: Modern JavaScript modules

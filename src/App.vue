@@ -6,9 +6,7 @@
     <!-- 主内容 -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- 左侧：上传和处理区域 -->
         <div class="space-y-6">
-          <!-- 图片选择区域 -->
           <ImageSelector
             :preset-images="presetImages"
             :selected-preset-image="selectedPresetImage"
@@ -21,7 +19,6 @@
             @file-input="handleFileInput"
           />
 
-          <!-- 处理选项 -->
           <ProcessingOptions
             v-if="selectedFiles.length > 0 || selectedPresetImage"
             :selected-type="selectedType"
@@ -31,21 +28,11 @@
             @start-processing="startProcessing"
           />
 
-          <!-- 处理进度 -->
-          <ProgressDisplay
-            v-if="status === 'processing'"
-            :progress="progress"
-          />
+          <ProgressDisplay v-if="status === 'processing'" :progress="progress" />
 
-          <!-- 错误提示 -->
-          <ErrorDisplay
-            v-if="error"
-            :error="error"
-            @close="handleErrorClose"
-          />
+          <ErrorDisplay v-if="error" :error="error" @close="handleErrorClose" />
         </div>
 
-        <!-- 右侧：结果展示区域 -->
         <div class="space-y-6">
           <ResultsDisplay
             :results="results as readonly MattingResult[]"
@@ -73,8 +60,26 @@ import { downloadImage } from '@/utils/image';
 import type { MattingType, MattingResult } from '@/types';
 
 // 使用组合式函数
-const { status, progress, error, results, processImage, processPresetImage, clearResults, removeResult, clearError } = useMatting();
-const { isDragover, selectedFiles, handleDragOver, handleDragLeave, handleDrop, handleFileInput, clearFiles } = useFileUpload();
+const {
+  status,
+  progress,
+  error,
+  results,
+  processImage,
+  processPresetImage,
+  clearResults,
+  removeResult,
+  clearError,
+} = useMatting();
+const {
+  isDragover,
+  selectedFiles,
+  handleDragOver,
+  handleDragLeave,
+  handleDrop,
+  handleFileInput,
+  clearFiles,
+} = useFileUpload();
 
 // 选择的抠图类型
 const selectedType = ref<MattingType>('auto');
@@ -85,69 +90,69 @@ const presetImages = ref([
     id: 'portrait-1',
     url: 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1',
     name: '人物肖像',
-    type: 'portrait' as MattingType
+    type: 'portrait' as MattingType,
   },
   {
     id: 'product-1',
     url: 'https://images.insmind.com/market-operations/market/side/70ca47baeb2a4fa796fb374b8cee5f22/1722596901962.png?x-oss-process=image/resize,w_400,type_6/interlace,1,image/format,webp',
     name: '商品展示',
-    type: 'product' as MattingType
+    type: 'product' as MattingType,
   },
   {
     id: 'graphic-1',
     url: 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1',
     name: '图形元素',
-    type: 'graphic' as MattingType
+    type: 'graphic' as MattingType,
   },
   {
     id: 'auto-1',
     url: 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1',
     name: '动物照片',
-    type: 'auto' as MattingType
+    type: 'auto' as MattingType,
   },
   {
     id: 'auto-2',
     url: 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1',
     name: '风景照片',
-    type: 'auto' as MattingType
+    type: 'auto' as MattingType,
   },
   {
     id: 'graphic-2',
     url: 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1',
     name: 'Logo设计',
-    type: 'graphic' as MattingType
-  }
+    type: 'graphic' as MattingType,
+  },
 ]);
 
 // 选中的预设图片
-const selectedPresetImage = ref<typeof presetImages.value[0] | null>(null);
+const selectedPresetImage = ref<(typeof presetImages.value)[0] | null>(null);
 
 // 抠图选项
 const mattingOptions = ref([
   {
     value: 'auto' as MattingType,
     label: '自动识别',
-    description: '智能识别图片类型并选择最佳算法'
+    description: '智能识别图片类型并选择最佳算法',
   },
   {
     value: 'portrait' as MattingType,
     label: '人像抠图',
-    description: '专门针对人物照片优化的抠图算法'
+    description: '专门针对人物照片优化的抠图算法',
   },
   {
     value: 'product' as MattingType,
     label: '商品抠图',
-    description: '适用于商品展示图的精确抠图'
+    description: '适用于商品展示图的精确抠图',
   },
   {
     value: 'graphic' as MattingType,
     label: '图形抠图',
-    description: '适用于图标、logo等图形元素'
-  }
+    description: '适用于图标、logo等图形元素',
+  },
 ]);
 
 // 事件处理函数
-const handlePresetImageSelect = (image: typeof presetImages.value[0]) => {
+const handlePresetImageSelect = (image: (typeof presetImages.value)[0]) => {
   selectedPresetImage.value = image;
   selectedType.value = image.type;
 };

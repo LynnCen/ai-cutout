@@ -42,10 +42,10 @@ export class ImageProcessor {
   static async convertMaskToAlpha(maskImageSrc: string): Promise<HTMLCanvasElement> {
     const maskImage = await this.loadImage(maskImageSrc);
     const { canvas, ctx } = this.createCanvas(maskImage.width, maskImage.height);
-    
+
     // 绘制mask图像
     ctx.drawImage(maskImage, 0, 0);
-    
+
     // 获取图像数据
     const imageData = ctx.getImageData(0, 0, maskImage.width, maskImage.height);
     const data = imageData.data;
@@ -53,7 +53,7 @@ export class ImageProcessor {
     // 白色(255)变为不透明(255)，黑色(0)变为透明(0)
     // for (let i = 0; i < data.length; i += 4) {
     //   const gray = data[i]; // 取红色通道作为灰度值
-      
+
     //   // 设置为白色，Alpha通道为灰度值
     //   data[i] = 255;     // R
     //   data[i + 1] = 255; // G
@@ -61,9 +61,9 @@ export class ImageProcessor {
     //   data[i + 3] = gray; // A - 使用灰度值作为透明度
     // }
 
-      // 处理mask
-      for (let i = 3; i < data.length; i += 4) {
-        data[i] = data[i - 3];
+    // 处理mask
+    for (let i = 3; i < data.length; i += 4) {
+      data[i] = data[i - 3];
     }
 
     // 将处理后的数据写回canvas
@@ -83,7 +83,7 @@ export class ImageProcessor {
   ): Promise<HTMLCanvasElement> {
     const [originalImage, maskCanvas] = await Promise.all([
       this.loadImage(originalImageSrc),
-      this.convertMaskToAlpha(maskImageSrc)
+      this.convertMaskToAlpha(maskImageSrc),
     ]);
 
     const { canvas: resultCanvas, ctx: resultCtx } = this.createCanvas(
@@ -97,14 +97,20 @@ export class ImageProcessor {
     // 应用mask - 使用destination-in混合模式
     resultCtx.save();
     resultCtx.globalCompositeOperation = 'destination-in';
-    
+
     // 将mask缩放到与原图相同尺寸
     resultCtx.drawImage(
-      maskCanvas, 
-      0, 0, maskCanvas.width, maskCanvas.height,
-      0, 0, originalImage.width, originalImage.height
+      maskCanvas,
+      0,
+      0,
+      maskCanvas.width,
+      maskCanvas.height,
+      0,
+      0,
+      originalImage.width,
+      originalImage.height
     );
-    
+
     resultCtx.restore();
 
     return resultCanvas;
@@ -125,13 +131,19 @@ export class ImageProcessor {
         bounds.width,
         bounds.height
       );
-      
+
       croppedCtx.drawImage(
         canvas,
-        bounds.x, bounds.y, bounds.width, bounds.height,
-        0, 0, bounds.width, bounds.height
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        0,
+        0,
+        bounds.width,
+        bounds.height
       );
-      
+
       return croppedCanvas;
     }
 
@@ -150,7 +162,10 @@ export class ImageProcessor {
     height: number;
   } | null {
     const { data, width, height } = imageData;
-    let minX = width, minY = height, maxX = 0, maxY = 0;
+    let minX = width,
+      minY = height,
+      maxX = 0,
+      maxY = 0;
     let hasContent = false;
 
     // 扫描所有像素，找到非透明像素的边界
@@ -175,7 +190,7 @@ export class ImageProcessor {
       x: minX,
       y: minY,
       width: maxX - minX + 1,
-      height: maxY - minY + 1
+      height: maxY - minY + 1,
     };
   }
 
@@ -186,13 +201,9 @@ export class ImageProcessor {
    * @param quality 质量(0-1)
    * @returns Promise<Blob>
    */
-  static canvasToBlob(
-    canvas: HTMLCanvasElement, 
-    type = 'image/png', 
-    quality = 1
-  ): Promise<Blob> {
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob!), type, quality);
+  static canvasToBlob(canvas: HTMLCanvasElement, type = 'image/png', quality = 1): Promise<Blob> {
+    return new Promise(resolve => {
+      canvas.toBlob(blob => resolve(blob!), type, quality);
     });
   }
 
@@ -203,11 +214,7 @@ export class ImageProcessor {
    * @param quality 质量(0-1)
    * @returns DataURL字符串
    */
-  static canvasToDataURL(
-    canvas: HTMLCanvasElement, 
-    type = 'image/png', 
-    quality = 1
-  ): string {
+  static canvasToDataURL(canvas: HTMLCanvasElement, type = 'image/png', quality = 1): string {
     return canvas.toDataURL(type, quality);
   }
 
@@ -217,7 +224,7 @@ export class ImageProcessor {
    * @returns Promise<string>
    */
   static blobToDataURL(blob: Blob): Promise<string> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
       reader.readAsDataURL(blob);

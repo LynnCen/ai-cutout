@@ -15,12 +15,12 @@ export function useFileUpload() {
         console.warn(`文件 ${file.name} 格式不支持`);
         continue;
       }
-      
+
       if (!isValidFileSize(file)) {
         console.warn(`文件 ${file.name} 大小超过限制`);
         continue;
       }
-      
+
       validFiles.push(file);
     }
 
@@ -42,7 +42,7 @@ export function useFileUpload() {
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     isDragover.value = false;
-    
+
     if (e.dataTransfer?.files) {
       return handleFiles(e.dataTransfer.files);
     }
@@ -70,6 +70,6 @@ export function useFileUpload() {
     handleDragLeave,
     handleDrop,
     handleFileInput,
-    clearFiles
+    clearFiles,
   };
 }

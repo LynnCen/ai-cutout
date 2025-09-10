@@ -208,7 +208,7 @@ const router = createRouter({
     } else {
       return { top: 0 };
     }
-  }
+  },
 });
 
 // 设置路由守卫
@@ -228,8 +228,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Home.vue'),
     meta: {
       title: '首页',
-      keepAlive: true
-    }
+      keepAlive: true,
+    },
   },
   {
     path: '/workspace',
@@ -237,8 +237,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/MattingWorkspace.vue'),
     meta: {
       title: '抠图工作台',
-      requiresAuth: false
-    }
+      requiresAuth: false,
+    },
   },
   {
     path: '/results',
@@ -246,25 +246,25 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ResultManager.vue'),
     meta: {
       title: '结果管理',
-      keepAlive: true
-    }
+      keepAlive: true,
+    },
   },
   {
     path: '/about',
     name: 'About',
     component: () => import('@/views/About.vue'),
     meta: {
-      title: '关于我们'
-    }
+      title: '关于我们',
+    },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFound.vue'),
     meta: {
-      title: '页面未找到'
-    }
-  }
+      title: '页面未找到',
+    },
+  },
 ];
 
 export default routes;
@@ -283,7 +283,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn';
 export function setupElementPlus(app: App) {
   app.use(ElementPlus, {
     locale: zhCn,
-    size: 'default'
+    size: 'default',
   });
 }
 ```
@@ -327,12 +327,12 @@ export class DifyMattingClient {
   constructor(config: { apiKey: string; baseURL: string }) {
     this.apiKey = config.apiKey;
     this.baseURL = config.baseURL;
-    
+
     this.client = axios.create({
       baseURL: this.baseURL,
       timeout: 30000,
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
       },
     });
@@ -343,17 +343,17 @@ export class DifyMattingClient {
   private setupInterceptors() {
     // 请求拦截器
     this.client.interceptors.request.use(
-      (config) => {
+      config => {
         console.log(`[Dify API] ${config.method?.toUpperCase()} ${config.url}`);
         return config;
       },
-      (error) => Promise.reject(error)
+      error => Promise.reject(error)
     );
 
     // 响应拦截器
     this.client.interceptors.response.use(
-      (response) => response.data,
-      (error) => {
+      response => response.data,
+      error => {
         console.error('[Dify API Error]', error.response?.data || error.message);
         return Promise.reject(new Error(error.response?.data?.message || '请求失败'));
       }
@@ -365,12 +365,12 @@ export class DifyMattingClient {
     const response = await this.client.post('/workflows/classify', {
       inputs: { image_url: imageUrl },
       response_mode: 'blocking',
-      user: 'frontend-user'
+      user: 'frontend-user',
     });
-    
+
     return {
       type: this.mapClassifyResult(response.data.outputs.type),
-      confidence: response.data.outputs.confidence
+      confidence: response.data.outputs.confidence,
     };
   }
 
@@ -379,12 +379,12 @@ export class DifyMattingClient {
     const response = await this.client.post('/workflows/product-matting', {
       inputs: { image_url: imageUrl },
       response_mode: 'blocking',
-      user: 'frontend-user'
+      user: 'frontend-user',
     });
-    
+
     return {
       maskImage: response.data.outputs.mask_image,
-      resultImage: response.data.outputs.result_image
+      resultImage: response.data.outputs.result_image,
     };
   }
 
@@ -393,12 +393,12 @@ export class DifyMattingClient {
     const response = await this.client.post('/workflows/portrait-matting', {
       inputs: { image_url: imageUrl },
       response_mode: 'blocking',
-      user: 'frontend-user'
+      user: 'frontend-user',
     });
-    
+
     return {
       maskImage: response.data.outputs.mask_image,
-      resultImage: response.data.outputs.result_image
+      resultImage: response.data.outputs.result_image,
     };
   }
 
@@ -407,12 +407,12 @@ export class DifyMattingClient {
     const response = await this.client.post('/workflows/graphic-matting', {
       inputs: { image_url: imageUrl },
       response_mode: 'blocking',
-      user: 'frontend-user'
+      user: 'frontend-user',
     });
-    
+
     return {
       maskImage: response.data.outputs.mask_image,
-      resultImage: response.data.outputs.result_image
+      resultImage: response.data.outputs.result_image,
     };
   }
 
@@ -420,7 +420,7 @@ export class DifyMattingClient {
     const typeMap: Record<number, MattingType> = {
       0: 'graphic',
       1: 'portrait',
-      2: 'product'
+      2: 'product',
     };
     return typeMap[type] || 'auto';
   }
@@ -440,7 +440,7 @@ import type { MattingRequest, MattingResult, ProcessingStatus } from '@/types/ma
 export function useMattingAPI() {
   const difyClient = new DifyMattingClient({
     apiKey: import.meta.env.VITE_DIFY_API_KEY,
-    baseURL: import.meta.env.VITE_DIFY_BASE_URL
+    baseURL: import.meta.env.VITE_DIFY_BASE_URL,
   });
 
   const processing = ref(false);
@@ -485,13 +485,12 @@ export function useMattingAPI() {
         type: mattingType,
         confidence: 0.95,
         processingTime: Date.now(),
-        metadata: await getImageMetadata(finalResult.resultImage)
+        metadata: await getImageMetadata(finalResult.resultImage),
       };
 
       progress.value = 100;
       status.value = 'completed';
       return result;
-
     } catch (err) {
       error.value = err instanceof Error ? err.message : '处理失败';
       status.value = 'failed';
@@ -540,7 +539,7 @@ export function useMattingAPI() {
     status: readonly(status),
     error: readonly(error),
     processMatting,
-    processBatch
+    processBatch,
   };
 }
 ```
@@ -576,11 +575,8 @@ export function useImageProcess() {
 
   // Mask图像转换
   const convertMaskImage = (maskImage: HTMLImageElement): HTMLCanvasElement => {
-    const { canvas: maskCanvas, ctx: maskCtx } = createCanvas(
-      maskImage.width, 
-      maskImage.height
-    );
-    
+    const { canvas: maskCanvas, ctx: maskCtx } = createCanvas(maskImage.width, maskImage.height);
+
     maskCtx.drawImage(maskImage, 0, 0);
     const imageData = maskCtx.getImageData(0, 0, maskImage.width, maskImage.height);
     const data = imageData.data;
@@ -655,17 +651,20 @@ export function useImageProcess() {
     const bounds = getImageBounds(imageData);
 
     if (bounds) {
-      const { canvas: croppedCanvas, ctx: croppedCtx } = createCanvas(
+      const { canvas: croppedCanvas, ctx: croppedCtx } = createCanvas(bounds.width, bounds.height);
+
+      croppedCtx.drawImage(
+        canvas,
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        0,
+        0,
         bounds.width,
         bounds.height
       );
-      
-      croppedCtx.drawImage(
-        canvas,
-        bounds.x, bounds.y, bounds.width, bounds.height,
-        0, 0, bounds.width, bounds.height
-      );
-      
+
       return croppedCanvas;
     }
 
@@ -682,8 +681,8 @@ export function useImageProcess() {
   };
 
   const canvasToBlob = (canvas: HTMLCanvasElement, type = 'image/png'): Promise<Blob> => {
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob!), type);
+    return new Promise(resolve => {
+      canvas.toBlob(blob => resolve(blob!), type);
     });
   };
 
@@ -700,7 +699,7 @@ export function useImageProcess() {
     addWatermark,
     cropToEdge,
     canvasToBlob,
-    canvasToDataURL
+    canvasToDataURL,
   };
 }
 ```
@@ -722,13 +721,9 @@ export const useMattingStore = defineStore('matting', () => {
   const progress = ref(0);
 
   // 计算属性
-  const completedResults = computed(() => 
-    results.value.filter(r => r.confidence > 0)
-  );
+  const completedResults = computed(() => results.value.filter(r => r.confidence > 0));
 
-  const processingCount = computed(() => 
-    processingQueue.value.length
-  );
+  const processingCount = computed(() => processingQueue.value.length);
 
   const totalProcessingTime = computed(() =>
     results.value.reduce((total, result) => total + result.processingTime, 0)
@@ -777,7 +772,7 @@ export const useMattingStore = defineStore('matting', () => {
       type: result.type,
       confidence: result.confidence,
       processingTime: result.processingTime,
-      metadata: result.metadata
+      metadata: result.metadata,
     }));
 
     if (format === 'json') {
@@ -791,9 +786,9 @@ export const useMattingStore = defineStore('matting', () => {
         item.confidence,
         item.processingTime,
         item.metadata.width,
-        item.metadata.height
+        item.metadata.height,
       ]);
-      
+
       return [headers, ...rows].map(row => row.join(',')).join('\n');
     }
   };
@@ -805,12 +800,12 @@ export const useMattingStore = defineStore('matting', () => {
     processingQueue: readonly(processingQueue),
     status: readonly(status),
     progress: readonly(progress),
-    
+
     // 计算属性
     completedResults,
     processingCount,
     totalProcessingTime,
-    
+
     // 方法
     addResult,
     removeResult,
@@ -820,7 +815,7 @@ export const useMattingStore = defineStore('matting', () => {
     clearQueue,
     updateStatus,
     updateProgress,
-    exportResults
+    exportResults,
   };
 });
 ```
@@ -843,11 +838,9 @@ export const useMattingStore = defineStore('matting', () => {
         multiple
         @change="handleFileSelect"
       >
-        <el-button type="primary" :icon="Upload">
-          选择图片
-        </el-button>
+        <el-button type="primary" :icon="Upload"> 选择图片 </el-button>
       </el-upload>
-      
+
       <el-select v-model="mattingType" placeholder="选择抠图类型">
         <el-option label="自动识别" value="auto" />
         <el-option label="人像抠图" value="portrait" />
@@ -855,12 +848,7 @@ export const useMattingStore = defineStore('matting', () => {
         <el-option label="图形抠图" value="graphic" />
       </el-select>
 
-      <el-button 
-        :disabled="!hasFiles || processing"
-        @click="startProcessing"
-      >
-        开始处理
-      </el-button>
+      <el-button :disabled="!hasFiles || processing" @click="startProcessing"> 开始处理 </el-button>
     </div>
 
     <!-- 主工作区 -->
@@ -869,11 +857,7 @@ export const useMattingStore = defineStore('matting', () => {
       <div class="original-panel">
         <h3>原始图片</h3>
         <div class="image-grid">
-          <div 
-            v-for="(file, index) in selectedFiles" 
-            :key="index"
-            class="image-item"
-          >
+          <div v-for="(file, index) in selectedFiles" :key="index" class="image-item">
             <img :src="getFilePreview(file)" :alt="`原图${index + 1}`" />
             <div class="image-info">
               <span>{{ file.name }}</span>
@@ -886,13 +870,13 @@ export const useMattingStore = defineStore('matting', () => {
       <!-- 中间：处理状态 -->
       <div class="processing-panel">
         <div v-if="processing" class="processing-status">
-          <el-progress 
-            :percentage="progress" 
+          <el-progress
+            :percentage="progress"
             :status="status === 'failed' ? 'exception' : undefined"
           />
           <p>{{ getStatusText() }}</p>
         </div>
-        
+
         <div v-if="error" class="error-message">
           <el-alert :title="error" type="error" show-icon />
         </div>
@@ -902,22 +886,14 @@ export const useMattingStore = defineStore('matting', () => {
       <div class="result-panel">
         <h3>处理结果</h3>
         <div class="result-grid">
-          <div 
-            v-for="result in results" 
-            :key="result.id"
-            class="result-item"
-          >
+          <div v-for="result in results" :key="result.id" class="result-item">
             <img :src="result.resultImage" :alt="result.type" />
             <div class="result-info">
               <span>{{ result.type }}</span>
               <span>置信度: {{ (result.confidence * 100).toFixed(1) }}%</span>
               <div class="result-actions">
-                <el-button size="small" @click="downloadResult(result)">
-                  下载
-                </el-button>
-                <el-button size="small" @click="previewResult(result)">
-                  预览
-                </el-button>
+                <el-button size="small" @click="downloadResult(result)"> 下载 </el-button>
+                <el-button size="small" @click="previewResult(result)"> 预览 </el-button>
               </div>
             </div>
           </div>
@@ -942,7 +918,7 @@ export const useMattingStore = defineStore('matting', () => {
             <img :src="currentPreview.maskImage" alt="遮罩图" />
           </div>
         </div>
-        
+
         <div class="preview-metadata">
           <h4>图片信息</h4>
           <el-descriptions :column="2" border>
@@ -1005,12 +981,12 @@ const startProcessing = async () => {
   try {
     const requests = selectedFiles.value.map(file => ({
       file,
-      type: mattingType.value
+      type: mattingType.value,
     }));
 
     const results = await processBatch(requests);
     results.forEach(result => mattingStore.addResult(result));
-    
+
     ElMessage.success(`成功处理 ${results.length} 张图片`);
     selectedFiles.value = [];
   } catch (err) {
@@ -1044,10 +1020,14 @@ const formatFileSize = (bytes: number): string => {
 
 const getStatusText = (): string => {
   switch (status.value) {
-    case 'processing': return '正在处理中...';
-    case 'completed': return '处理完成';
-    case 'failed': return '处理失败';
-    default: return '准备就绪';
+    case 'processing':
+      return '正在处理中...';
+    case 'completed':
+      return '处理完成';
+    case 'failed':
+      return '处理失败';
+    default:
+      return '准备就绪';
   }
 };
 </script>
@@ -1180,9 +1160,9 @@ export class PerformanceOptimizer {
   static async processInWorker<T>(task: any): Promise<T> {
     return new Promise((resolve, reject) => {
       const worker = this.getAvailableWorker();
-      
+
       worker.postMessage(task);
-      worker.onmessage = (event) => {
+      worker.onmessage = event => {
         if (event.data.error) {
           reject(new Error(event.data.error));
         } else {
@@ -1229,7 +1209,7 @@ export class PerformanceOptimizer {
       console.log('Memory Usage:', {
         used: Math.round(memory.usedJSHeapSize / 1048576) + 'MB',
         total: Math.round(memory.totalJSHeapSize / 1048576) + 'MB',
-        limit: Math.round(memory.jsHeapSizeLimit / 1048576) + 'MB'
+        limit: Math.round(memory.jsHeapSizeLimit / 1048576) + 'MB',
       });
     }
   }
@@ -1298,15 +1278,15 @@ import { useMattingAPI } from '@/composables/useMattingAPI';
 describe('useMattingAPI', () => {
   it('should process matting request successfully', async () => {
     const { processMatting } = useMattingAPI();
-    
+
     const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
     const request = {
       file: mockFile,
-      type: 'product' as const
+      type: 'product' as const,
     };
 
     const result = await processMatting(request);
-    
+
     expect(result).toHaveProperty('id');
     expect(result).toHaveProperty('resultImage');
     expect(result.type).toBe('product');
@@ -1314,10 +1294,10 @@ describe('useMattingAPI', () => {
 
   it('should handle processing errors', async () => {
     const { processMatting } = useMattingAPI();
-    
+
     const invalidRequest = {
       file: 'invalid-url',
-      type: 'product' as const
+      type: 'product' as const,
     };
 
     await expect(processMatting(invalidRequest)).rejects.toThrow();
@@ -1379,18 +1359,18 @@ export default defineConfig({
       inject: {
         data: {
           title: '智能抠图系统',
-          description: '基于AI的专业图像抠图工具'
-        }
-      }
+          description: '基于AI的专业图像抠图工具',
+        },
+      },
     }),
     // 构建分析
     visualizer({
       filename: 'dist/stats.html',
       open: true,
-      gzipSize: true
-    })
+      gzipSize: true,
+    }),
   ],
-  
+
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -1405,9 +1385,9 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/styles/variables.scss";`
-      }
-    }
+        additionalData: `@import "@/styles/variables.scss";`,
+      },
+    },
   },
 
   build: {
@@ -1415,19 +1395,19 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    
+
     rollupOptions: {
       output: {
         manualChunks: {
           'vue-vendor': ['vue', 'vue-router', 'pinia'],
           'ui-vendor': ['element-plus'],
           'utils-vendor': ['lodash-es', 'axios'],
-          'canvas-utils': ['fabric', 'konva']
+          'canvas-utils': ['fabric', 'konva'],
         },
         chunkFileNames: 'js/[name]-[hash].js',
         entryFileNames: 'js/[name]-[hash].js',
-        assetFileNames: '[ext]/[name]-[hash].[ext]'
-      }
+        assetFileNames: '[ext]/[name]-[hash].[ext]',
+      },
     },
 
     minify: 'terser',
@@ -1435,12 +1415,12 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log']
-      }
+        pure_funcs: ['console.log'],
+      },
     },
 
     // 资源内联阈值
-    assetsInlineLimit: 4096
+    assetsInlineLimit: 4096,
   },
 
   server: {
@@ -1452,25 +1432,25 @@ export default defineConfig({
       '/api/dify': {
         target: process.env.VITE_DIFY_BASE_URL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/dify/, ''),
+        rewrite: path => path.replace(/^\/api\/dify/, ''),
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.log('proxy error', err);
           });
-        }
-      }
-    }
+        },
+      },
+    },
   },
 
   preview: {
     port: 4173,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
   },
 
   // 环境变量类型定义
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
-  }
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+  },
 });
 ```
 
@@ -1516,15 +1496,8 @@ export default defineConfig({
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src/**/*.ts", 
-    "src/**/*.d.ts", 
-    "src/**/*.tsx", 
-    "src/**/*.vue"
-  ],
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
 ```
 
@@ -1553,11 +1526,7 @@ VITE_CDN_BASE_URL=https://cdn.example.com
 ```json
 // .eslintrc.json
 {
-  "extends": [
-    "@vue/typescript/recommended",
-    "@vue/prettier",
-    "@vue/prettier/@typescript-eslint"
-  ],
+  "extends": ["@vue/typescript/recommended", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
   "parserOptions": {
     "ecmaVersion": 2020
   },
@@ -1673,13 +1642,13 @@ export const getCDNUrl = (path: string): string => {
 
 ### 技术选型理由
 
-| 技术 | 选择理由 | 替代方案 |
-|------|----------|----------|
-| Vue3 | 渐进式框架，学习成本低，生态完善 | React, Angular |
-| TypeScript | 类型安全，IDE支持好，重构友好 | JavaScript |
-| Vite | 开发体验好，构建速度快，配置简单 | webpack, Rollup |
-| Pinia | API简洁，TypeScript支持好 | Vuex, Zustand |
-| Element Plus | 组件丰富，文档完善，定制性强 | Ant Design Vue |
+| 技术         | 选择理由                         | 替代方案        |
+| ------------ | -------------------------------- | --------------- |
+| Vue3         | 渐进式框架，学习成本低，生态完善 | React, Angular  |
+| TypeScript   | 类型安全，IDE支持好，重构友好    | JavaScript      |
+| Vite         | 开发体验好，构建速度快，配置简单 | webpack, Rollup |
+| Pinia        | API简洁，TypeScript支持好        | Vuex, Zustand   |
+| Element Plus | 组件丰富，文档完善，定制性强     | Ant Design Vue  |
 
 ### 开发规范
 
@@ -1688,7 +1657,7 @@ export const getCDNUrl = (path: string): string => {
 ```typescript
 // 组件命名：PascalCase
 export default defineComponent({
-  name: 'MattingUploader'
+  name: 'MattingUploader',
 });
 
 // 文件命名：kebab-case
@@ -1712,26 +1681,26 @@ export function useMattingAPI() {
   // 1. 响应式状态
   const processing = ref(false);
   const progress = ref(0);
-  
+
   // 2. 计算属性
   const isCompleted = computed(() => progress.value === 100);
-  
+
   // 3. 方法定义
   const processMatting = async () => {
     // 实现逻辑
   };
-  
+
   // 4. 生命周期
   onMounted(() => {
     // 初始化逻辑
   });
-  
+
   // 5. 返回接口
   return {
     processing: readonly(processing),
     progress: readonly(progress),
     isCompleted,
-    processMatting
+    processMatting,
   };
 }
 ```
@@ -1755,22 +1724,22 @@ export class MattingError extends Error {
 export const ErrorBoundary = defineComponent({
   setup(_, { slots }) {
     const error = ref<Error | null>(null);
-    
+
     const handleError = (err: Error) => {
       error.value = err;
       console.error('Component Error:', err);
     };
-    
+
     return () => {
       if (error.value) {
         return h('div', { class: 'error-boundary' }, [
           h('h3', '出现错误'),
-          h('p', error.value.message)
+          h('p', error.value.message),
         ]);
       }
       return slots.default?.();
     };
-  }
+  },
 });
 ```
 
@@ -1781,7 +1750,7 @@ export const ErrorBoundary = defineComponent({
 ### 核心优势
 
 1. **现代化技术栈**: Vue3 Composition API + TypeScript提供了优秀的开发体验
-2. **工程化架构**: 清晰的项目结构和代码组织，便于团队协作和维护  
+2. **工程化架构**: 清晰的项目结构和代码组织，便于团队协作和维护
 3. **AI能力集成**: 通过Dify平台提供的专业抠图算法，确保处理质量
 4. **性能优化**: Web Worker、Canvas池、图像缓存等多重优化策略
 5. **用户体验**: 实时进度反馈、批量处理、结果预览等贴心功能

@@ -1,9 +1,5 @@
 {
-  "extends": [
-    "@vue/typescript/recommended",
-    "@vue/prettier",
-    "@vue/prettier/@typescript-eslint"
-  ],
+  "extends": ["@vue/typescript/recommended", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
   "parserOptions": {
     "ecmaVersion": 2020
   },
