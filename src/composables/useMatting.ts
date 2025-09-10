@@ -115,6 +115,11 @@ export function useMatting() {
     }
   };
 
+  // 清除错误
+  const clearError = () => {
+    error.value = null;
+  };
+
   return {
     // 状态
     status: readonly(status),
@@ -127,6 +132,7 @@ export function useMatting() {
     processPresetImage,
     reset,
     clearResults,
-    removeResult
+    removeResult,
+    clearError
   };
 }
