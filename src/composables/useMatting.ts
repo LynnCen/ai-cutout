@@ -28,14 +28,14 @@ export function useMatting() {
       const result = await difyClient.processImage(imageDataUrl, type);
       progress.value = 80;
 
-      // 使用固定的测试图片作为原图显示
-      const testImageUrl = 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1';
+      // 使用原始图片的DataURL作为原图显示
+      const originalImageUrl = imageDataUrl;
       
       // 生成结果对象
       const mattingResult: MattingResult = {
         id: generateId(),
-        originalImage: testImageUrl,
-        resultImage: result.resultImage || testImageUrl,
+        originalImage: originalImageUrl,
+        resultImage: result.resultImage || originalImageUrl,
         maskImage: result.maskImage,
         type,
         confidence: result.confidence,
@@ -57,17 +57,18 @@ export function useMatting() {
   };
 
   // 处理预设图片
-  const processPresetImage = async (image: { url: string; name: string; type: MattingType }, type: MattingType = 'auto'): Promise<MattingResult> => {
+  const processPresetImage = async (image: { url: string; name: string; type: MattingType }): Promise<MattingResult> => {
     try {
       status.value = 'processing';
       error.value = null;
       progress.value = 0;
 
-      // 调用Dify API
+      // 调用Dify API - 使用预设图片自带的类型，而不是传入的type参数
       const startTime = Date.now();
       progress.value = 20;
       
-      const result = await difyClient.processImage(image.url, type);
+      const actualType = image.type; // 使用预设图片的类型
+      const result = await difyClient.processImage(image.url, actualType);
       progress.value = 80;
 
       // 生成结果对象
@@ -76,7 +77,7 @@ export function useMatting() {
         originalImage: image.url,
         resultImage: result.resultImage || image.url,
         maskImage: result.maskImage,
-        type,
+        type: actualType, // 使用实际的类型
         confidence: result.confidence,
         processingTime: Date.now() - startTime
       };
@@ -119,6 +120,7 @@ export function useMatting() {
   const clearError = () => {
     error.value = null;
   };
+
 
   return {
     // 状态

@@ -89,7 +89,7 @@ const presetImages = ref([
   },
   {
     id: 'product-1',
-    url: 'https://insmind-gdesign-dam-fat-static.xsbapp.com/33665218580841555/8715d817ef2f44e4a0abdb094119692f.png?x-oss-process=image/resize,w_3000,h_3000,type_6/interlace,1',
+    url: 'https://images.insmind.com/market-operations/market/side/70ca47baeb2a4fa796fb374b8cee5f22/1722596901962.png?x-oss-process=image/resize,w_400,type_6/interlace,1,image/format,webp',
     name: '商品展示',
     type: 'product' as MattingType
   },
@@ -165,7 +165,8 @@ const startProcessing = async () => {
 
   try {
     if (selectedPresetImage.value) {
-      await processPresetImage(selectedPresetImage.value, selectedType.value);
+      // 预设图片使用自带的类型，不需要传入selectedType
+      await processPresetImage(selectedPresetImage.value);
     } else {
       const file = selectedFiles.value[0];
       await processImage(file, selectedType.value);
