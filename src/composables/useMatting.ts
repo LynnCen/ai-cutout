@@ -56,6 +56,45 @@ export function useMatting() {
     }
   };
 
+  // 处理预设图片
+  const processPresetImage = async (image: { url: string; name: string; type: MattingType }, type: MattingType = 'auto'): Promise<MattingResult> => {
+    try {
+      status.value = 'processing';
+      error.value = null;
+      progress.value = 0;
+
+      // 调用Dify API
+      const startTime = Date.now();
+      progress.value = 20;
+      
+      const result = await difyClient.processImage(image.url, type);
+      progress.value = 80;
+
+      // 生成结果对象
+      const mattingResult: MattingResult = {
+        id: generateId(),
+        originalImage: image.url,
+        resultImage: result.resultImage || image.url,
+        maskImage: result.maskImage,
+        type,
+        confidence: result.confidence,
+        processingTime: Date.now() - startTime
+      };
+
+      // 添加到结果列表
+      results.value.unshift(mattingResult);
+      
+      progress.value = 100;
+      status.value = 'completed';
+      
+      return mattingResult;
+    } catch (err) {
+      status.value = 'failed';
+      error.value = err instanceof Error ? err.message : '处理失败';
+      throw err;
+    }
+  };
+
   // 重置状态
   const reset = () => {
     status.value = 'idle';
@@ -85,6 +124,7 @@ export function useMatting() {
     
     // 方法
     processImage,
+    processPresetImage,
     reset,
     clearResults,
     removeResult

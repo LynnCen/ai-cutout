@@ -18,15 +18,37 @@ export interface MattingResult {
 // Dify API 响应
 export interface DifyResponse {
   event: string;
+  workflow_run_id: string;
   task_id: string;
-  id: string;
-  message_id: string;
-  conversation_id: string;
-  answer: string;
   data: {
-    mask_image?: string;
-    result_image?: string;
-    type?: number;
-    confidence?: number;
+    id: string;
+    workflow_id: string;
+    sequence_number: number;
+    status: string;
+    outputs: {
+      content: string; // JSON字符串，包含资源信息
+    };
+    error: string | null;
+    elapsed_time: number;
+    total_tokens: number;
+    total_steps: number;
+    created_by: {
+      id: string;
+      user: string;
+    };
+    created_at: number;
+    finished_at: number;
+    exceptions_count: number;
+    files: any[];
+  };
+}
+
+// 解析后的内容资源
+export interface ContentResource {
+  type: string;
+  resource: {
+    uri: string;
+    mimeType: string;
+    text: string;
   };
 }
